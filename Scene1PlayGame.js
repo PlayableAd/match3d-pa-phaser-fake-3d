@@ -10,13 +10,8 @@ class Scene1PlayGame extends Phaser.Scene {
         this.matter.world.setBounds(0, 0, 600, 800);
         var shapes = this.cache.json.get('shapes');
 
-        this.matter.add.sprite(100, 50, 'sprStar', 'Icon_Star', { shape: shapes.Icon_Star });
-        this.object = this.matter.add.sprite(200, 50, 'sprStar', 'Icon_Star', { shape: shapes.Icon_Star }).setOrigin(0.5).setDepth(2).setScale(0.5).setInteractive();
-        // this.deadzone = this.matter.add.sprite(0, 0, "sprDeadzone").setOrigin(0).setPosition(100, 100).setInteractive();
-        var  zone = this.add.zone(600, 200).setSize(600, 200);
-        this.physics.world.enable(zone);
-        // this.deadzone.body.setAllowGravity(false);
-        this.deadzone.body.moves = false;
+        this.object = this.matter.add.sprite(100, 50, 'sprStar', { shape: shapes.Icon_Star }).setInteractive();
+        this.deadzone = this.add.image(0, 0, "sprDeadzone").setOrigin(0).setPosition(100, 100).setInteractive();
 
         this.shadow = this.add.sprite(200 - 20, 50 - 20, 'sprStar_shadow').setOrigin(0.5).setDepth(1).setScale(0.5);
         this.shadow.tint = 0x999999;
@@ -28,7 +23,6 @@ class Scene1PlayGame extends Phaser.Scene {
         this.deadzone.on('pointerover', function () {
             console.log('over');
         });
-        this.matter.overlap(this.deadzone, this.object)
         this.input.on('dragstart', function (pointer) {
             this.scene.object.setCollisionCategory(null);
             this.scene.tweens.add({
@@ -52,7 +46,6 @@ class Scene1PlayGame extends Phaser.Scene {
                 yoyo: false
             });
         });
-        this.input.setDraggable(this.object);
         this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
 
             gameObject.x = dragX;

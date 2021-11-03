@@ -1,7 +1,6 @@
 function gameStart() { }
 var nAssets = 2;
 var nLoaded = 0;
-var sprMovementDemonImg = new Image();
 var bgSound, jumpSound, winSound, loseSound, attackSound, collectCoinSound, hitBonusBlockSound, killEnemySound, standOnEnemySound, flagSound, bossDeadSound;
 var Sounds;
 class Preload extends Phaser.Scene {

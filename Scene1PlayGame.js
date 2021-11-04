@@ -1,34 +1,41 @@
-
+var background, deadzone1, deadzone2, plate;
+var width = window.innerWidth, height = window.innerHeight;
+var scaleDeadzoneSize = 1.5;
 class Scene1PlayGame extends Phaser.Scene {
     constructor() {
         super({ key: "Scene1PlayGame" });
     }
     preload() {
-        this.load.json('shapes', example);
+        this.load.json('shapes', physicsLine);
     }
     create() {
-        this.matter.world.setBounds(0, 0, 600, 800);
+        this.matter.world.setBounds(0, 0, width, height);
         var shapes = this.cache.json.get('shapes');
 
-        this.object = this.matter.add.sprite(100, 50, 'sprStar', { shape: shapes.Icon_Star }).setInteractive();
-        this.deadzone = this.add.image(0, 0, "sprDeadzone").setOrigin(0).setPosition(100, 100).setInteractive();
+        background = this.add.image(0, 0, KEY_BACKGROUND).setOrigin(0);
+        deadzone1 = this.add.image(0, 0, KEY_DEADZONE).setScale(scaleDeadzoneSize).setInteractive();
+        deadzone1.setPosition((width / 2 - deadzone1.width / scaleDeadzoneSize), 3 / 4 * height);
+        deadzone2 = this.add.image(0, 0, KEY_DEADZONE).setScale(scaleDeadzoneSize).setInteractive();
+        deadzone2.setPosition(deadzone1.x + deadzone1.width * scaleDeadzoneSize, 3 / 4 * height)
 
-        this.shadow = this.add.sprite(200 - 20, 50 - 20, 'sprStar_shadow').setOrigin(0.5).setDepth(1).setScale(0.5);
+        this.object = this.matter.add.sprite(100, 50, KEY_STAR, 0, { shape: shapes.Icon_Star }).setDepth(2).setInteractive();
+        this.input.setDraggable(this.object);
+        this.shadow = this.add.sprite(200 - 20, 50 - 20, KEY_STAR).setOrigin(0.5).setDepth(1).setScale();
         this.shadow.tint = 0x999999;
         this.shadow.alpha = 0.3;
-        this.shadow1 = this.add.sprite(100 - 20, 50 - 20, 'sprStar').setOrigin(0.5).setDepth(1);
-        this.shadow1.tint = 0x999999;
-        this.shadow1.alpha = 0.3;
 
-        this.deadzone.on('pointerover', function () {
-            console.log('over');
+        deadzone1.on('pointerover', function () {
+            console.log('deadzone1 hover');
+        });
+        deadzone2.on('pointerover', function () {
+            console.log('deadzone2 hover');
         });
         this.input.on('dragstart', function (pointer) {
             this.scene.object.setCollisionCategory(null);
             this.scene.tweens.add({
                 targets: [this.scene.object, this.scene.shadow],
-                scaleX: '0.8',
-                scaleY: '0.8',
+                scaleX: '1.2',
+                scaleY: '1.2',
                 ease: 'Cubic',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
                 duration: 100,
                 repeat: 0,            // -1: infinity
@@ -38,25 +45,43 @@ class Scene1PlayGame extends Phaser.Scene {
             this.scene.object.setCollisionCategory(1);
             this.scene.tweens.add({
                 targets: [this.scene.object, this.scene.shadow],
-                scaleX: '0.5',
-                scaleY: '0.5',
+                scaleX: '1',
+                scaleY: '1',
                 ease: 'Cubic',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
                 duration: 100,
                 repeat: 0,            // -1: infinity
                 yoyo: false
             });
         });
+        let this2 = this
         this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
-
             gameObject.x = dragX;
             gameObject.y = dragY;
-
+            this2.handleDeadZone(pointer)
         });
-        this.resize()
+        this.resize();
+
         this.scale.on("resize", this.resize, this);
     }
+    handleDeadZone(pointer) {
+        console.log((deadzone1.y + (deadzone1.height / 2)));
+        console.log((deadzone2.y - (deadzone2.height / 2)));
+        if (pointer.y <= (deadzone1.y + (deadzone1.height / 2)) && pointer.y >= (deadzone2.y - (deadzone2.height / 2))) {
+            console.log("touch");
+        }
+    }
+    resize(gameSize) {
+        width = gameSize?.width || window.innerWidth;
+        height = gameSize?.height || window.innerHeight;
+        this.matter.world.setBounds(0, 0, width, height);
+        background.displayWidth = width
+        background.displayHeight = height;
+        // plate.displayWidth = width;
+        // plate.displayHeight = 3/4*height;
+        deadzone1.setPosition((width / 2 - deadzone1.width / scaleDeadzoneSize), 3 / 4 * height);
+        deadzone2.setPosition(deadzone1.x + deadzone1.width * scaleDeadzoneSize, 3 / 4 * height)
+        // deadzone2.setPosition(deadzone1.x + deadzone1.width / 2, 3 / 4 * height)
 
-    resize() {
 
     }
 

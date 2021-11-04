@@ -1,5 +1,5 @@
 function gameStart() { }
-var nAssets = 2;
+var nAssets = 4;
 var nLoaded = 0;
 var bgSound, jumpSound, winSound, loseSound, attackSound, collectCoinSound, hitBonusBlockSound, killEnemySound, standOnEnemySound, flagSound, bossDeadSound;
 var Sounds;
@@ -17,9 +17,13 @@ class Preload extends Phaser.Scene {
     }
 
     create() {
-        this.textures.addBase64("sprStar", sprStarB64);
+        this.textures.addBase64(KEY_STAR, sprStarB64);
         nLoaded++;
-        this.textures.addBase64("sprDeadzone", sprDeadZoneB64);
+        this.textures.addBase64(KEY_PLATE, sprPlateB64);
+        nLoaded++;
+        this.textures.addBase64(KEY_BACKGROUND, sprBackgroundB64);
+        nLoaded++;
+        this.textures.addBase64(KEY_DEADZONE, sprDeadZoneB64);
         nLoaded++;
         if (nLoaded >= nAssets) {
             var actualCreate = this.createGameObjects.bind(this);

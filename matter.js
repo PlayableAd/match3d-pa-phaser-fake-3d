@@ -1,4 +1,4 @@
-var example = {
+var physicsLine = {
 	"generator_info": "Shape definitions generated with PhysicsEditor. Visit https://www.codeandweb.com/physicseditor",
 	"Icon_Star": {
 		"type": "fromPhysicsEditor",

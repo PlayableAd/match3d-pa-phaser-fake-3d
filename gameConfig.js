@@ -6,7 +6,7 @@ var config = {
     physics: {
         default: "matter",
         matter: {
-            gravity: { x: 0, y: 0 },
+            gravity: { x: 0, y: 1 },
             debug: true,
         },
     },

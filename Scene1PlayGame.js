@@ -37,7 +37,8 @@ class Scene1PlayGame extends Phaser.Scene {
             container.setSize(object.width, object.height);
             container.setInteractive();
             this.input.setDraggable(container);
-            this.matter.add.gameObject(container, { shape: shapes.Icon_Star }).setFrictionAir(0.001).setBounce(0.20);
+            this.matter.add.gameObject(container, { shape: shapes.Icon_Star })
+            // .setFrictionAir(0.001).setBounce(0.20);
         }
 
 
@@ -122,11 +123,9 @@ class Scene1PlayGame extends Phaser.Scene {
             if (checkGroup.getChildren().length == 2) {
                 if (checkGroup.getChildren()[0]?.label === checkGroup.getChildren()[1]?.label) {
                     gameObject.setCollisionCategory(null);
-                    // gameObject.setCollisionByExclusion([-1]);
                     checkGroup.getChildren().map(function (child) {
-                        // child.setScale(0.2)
                         this2.tweens.add({
-                            targets: [checkGroup.getChildren()[0], checkGroup.getChildren()[1]],
+                            targets: [child],
                             x: deadzone1.x + halfWidthDeadZone,
                             scale: 0,
                             ease: 'Cubic.In',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
@@ -138,18 +137,12 @@ class Scene1PlayGame extends Phaser.Scene {
                                 this2.time.addEvent({
                                     delay: 500,                // ms
                                     callback: function () {
-                                        console.log(gameObject);
-                                        gameObject.setCollisionCategory(null);
-                                        // gameObject.destroy();
-                                        checkGroup.remove(checkGroup.getLast(true), true,);
-                                        checkGroup.remove(checkGroup.getLast(true), true,);
+                                        child.destroy();
                                     },
                                     //args: [],
                                     callbackScope: this2,
                                     loop: false
                                 });
-
-                                // console.log(checkGroup.getChildren().length);
                             }
                         })
                     })
@@ -158,8 +151,6 @@ class Scene1PlayGame extends Phaser.Scene {
         }).on('drag', function (pointer, gameObject, dragX, dragY) {
             gameObject.x = dragX;
             gameObject.y = dragY;
-            // gameObject.list[0].x = gameObject.list[1].x;
-            // gameObject.list[1].y = gameObject.list[1].y;
 
         });
         this.resize();

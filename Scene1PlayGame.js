@@ -9,6 +9,7 @@ class Scene1PlayGame extends Phaser.Scene {
     constructor() {
         super({ key: "Scene1PlayGame" });
     }
+
     preload() {
         this.load.json('Key_physicsLine', physicsLine);
     }
@@ -19,40 +20,28 @@ class Scene1PlayGame extends Phaser.Scene {
         background = this.add.image(0, 0, KEY_BACKGROUND).setOrigin(0);
         clock = this.add.image(0, 0, KEY_CLOCK).setScale(0.7).setDepth(10).setOrigin(0).setPosition(width / 2 - 100, 100);
         timeLabel = this.add.text(width / 2, 100, "59", { fontFamily: "Righteous, cursive", fontSize: '70px', fill: '#fff' }).setOrigin(0).setDepth(10).setPosition(clock.x + 120, clock.y + 10);
-        backgroundClock = this.add.image(0, 0, KEY_BACKGROUND_CLOCK).setOrigin(0).setScale(0.8).setPosition(clock.x - 40, clock.y - 20);
+        backgroundClock = this.add.image(0, 0, KEY_BACKGROUND_CLOCK).setOrigin(0).setScale(0.8).setDepth(9).setPosition(clock.x - 40, clock.y - 20);
         deadzone1 = this.add.image(0, 0, KEY_DEADZONE).setScale(scaleDeadzoneSize).setInteractive();
         deadzone1.setPosition((width / 2 - deadzone1.width / scaleDeadzoneSize), 3 / 4 * height);
         deadzone2 = this.add.image(0, 0, KEY_DEADZONE).setScale(scaleDeadzoneSize).setInteractive();
         deadzone2.setPosition(deadzone1.x + deadzone1.width * scaleDeadzoneSize, 3 / 4 * height)
+
         let objLength = 10;
 
         for (let i = 0; i < objLength; i++) {
-            var shadow = this.add.image(5, 5, KEY_STAR);
-            shadow.setTint(0x000000);
-            var object = this.add.image(0, 0, KEY_STAR, 0, { shape: shapes.Icon_Star });
+            var object = this.add.image(0, 0, KEY_STAR);
+            var shadow = this.add.image(object.x + 10, object.y + 10, KEY_STAR);
+            shadow.setTint(0x000000).setAlpha(0.6);
             var container = this.add.container(200, 200, [shadow, object], {
                 immovable: true,
                 allowGravity: false
             });
             container.setSize(object.width, object.height);
+            container.setPosition(this.randomIntFromInterval(30, width - 30), this.randomIntFromInterval(250, height / 2 + 300));
             container.setInteractive();
             this.input.setDraggable(container);
             this.matter.add.gameObject(container, { shape: shapes.Icon_Star })
-            // .setFrictionAir(0.001).setBounce(0.20);
         }
-
-
-        // this.object = this.matter.add.sprite(100, 50, KEY_STAR, 0, { shape: shapes.Icon_Star }).setDepth(2).setInteractive();
-        // this.input.setDraggable(this.object);
-
-        // this.object2 = this.matter.add.sprite(100, 50, KEY_STAR, 0, { shape: shapes.Icon_Star }).setDepth(2).setInteractive();
-        // this.input.setDraggable(this.object2);
-
-        // this.shadow = this.add.image(this.object - 20, this.object - 20, KEY_STAR).setOrigin(0.5).setDepth(1);
-        // this.shadow.setTint(0x000000);
-
-        // console.log(this.shadow)
-        // this.shadow.alpha = 0.4;
         deadzone1.on('pointerover', function () {
             console.log('deadzone1 hover');
         });
@@ -66,11 +55,22 @@ class Scene1PlayGame extends Phaser.Scene {
         this.input.on('dragstart', function (pointer, gameObject) {
             gameObject.setCollisionCategory(null);
             gameObject.setDepth(3);
-            // this2.shadow.setTint(0x000000)
+            let shadowobj = gameObject.first;
             this.scene.tweens.add({
-                targets: [gameObject],
+                targets: gameObject,
                 scaleX: '1.2',
                 scaleY: '1.2',
+                ease: 'Cubic',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
+                duration: 100,
+                repeat: 0,            // -1: infinity
+                yoyo: false
+            });
+            this.scene.tweens.add({
+                targets: shadowobj,
+                x: shadowobj.x + 20,
+                y: shadowobj.y + 20,
+                scale: '1.2',
+                alpha: 0.3,
                 ease: 'Cubic',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
                 duration: 100,
                 repeat: 0,            // -1: infinity
@@ -79,6 +79,7 @@ class Scene1PlayGame extends Phaser.Scene {
         }).on('dragend', function (pointer, gameObject) {
             gameObject.setCollisionCategory(1);
             gameObject.setDepth(2);
+            let shadowobj = gameObject.first;
             this2.tweens.add({
                 targets: gameObject,
                 scaleX: '1',
@@ -88,6 +89,17 @@ class Scene1PlayGame extends Phaser.Scene {
                 repeat: 0,            // -1: infinity
                 yoyo: false
             })
+            this.scene.tweens.add({
+                targets: shadowobj,
+                x: shadowobj.x - 20,
+                y: shadowobj.y - 20,
+                scale: '1',
+                alpha: 0.6,
+                ease: 'Cubic',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
+                duration: 100,
+                repeat: 0,            // -1: infinity
+                yoyo: false
+            });
             let touchDeadZone = this2.handleDeadZone(pointer);
             if (touchDeadZone == "touchDeadZone1") {
                 // this2.playSound("hitSound");
@@ -103,7 +115,9 @@ class Scene1PlayGame extends Phaser.Scene {
                     repeat: 0,            // -1: infinity
                     yoyo: false
                 })
-                checkGroup.add(gameObject);
+                if (checkGroup.getLength() < 2) {
+                    checkGroup.add(gameObject);
+                }
             } else if (touchDeadZone == "touchDeadZone2") {
                 gameObject.disableInteractive();
                 this2.tweens.add({
@@ -120,24 +134,28 @@ class Scene1PlayGame extends Phaser.Scene {
                 checkGroup.add(gameObject);
             }
             // console.log(checkGroup.getChildren()[0].body.label);
-            if (checkGroup.getChildren().length == 2) {
-                if (checkGroup.getChildren()[0]?.label === checkGroup.getChildren()[1]?.label) {
+            let checkGroupList = checkGroup.getChildren();
+
+            if (checkGroupList.length == 2) {
+                if (checkGroupList[0]?.label === checkGroupList[1]?.label) {
                     gameObject.setCollisionCategory(null);
-                    checkGroup.getChildren().map(function (child) {
+                    checkGroupList.map(function (child) {
                         this2.tweens.add({
                             targets: [child],
                             x: deadzone1.x + halfWidthDeadZone,
                             scale: 0,
                             ease: 'Cubic.In',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
                             delay: 200,
-                            duration: 500,
+                            duration: 400,
                             repeat: 0,            // -1: infinity
                             yoyo: false,
                             onComplete: function () {
                                 this2.time.addEvent({
-                                    delay: 500,                // ms
+                                    delay: 300,                // ms
                                     callback: function () {
-                                        child.destroy();
+                                        // child.destroy();
+                                        checkGroup = this.add.group();
+                                        child.y = -10000;
                                     },
                                     //args: [],
                                     callbackScope: this2,
@@ -173,23 +191,16 @@ class Scene1PlayGame extends Phaser.Scene {
         let bottomHeight = deadzone1.y - halfHeightDeadZone - moreBoundsDeadZone;
 
         let leftWidth1 = deadzone1.x - halfWidthDeadZone - moreBoundsDeadZone;
-        let rightWidth1 = deadzone1.x + halfWidthDeadZone + moreBoundsDeadZone;
 
-        let leftWidth2 = deadzone2.x - halfWidthDeadZone - moreBoundsDeadZone;
         let rightWidth2 = deadzone2.x + halfWidthDeadZone + moreBoundsDeadZone;
 
         if (pointer.y <= topHeight && pointer.y >= bottomHeight) {
-            console.log(checkGroup.getChildren());
             if ((pointer.x >= leftWidth1 && pointer.x <= rightWidth2) && checkGroup.getChildren().length == 0) {
                 return "touchDeadZone1";
             } else if ((pointer.x >= leftWidth1 && pointer.x <= rightWidth2) && checkGroup.getChildren().length == 1) {
                 return "touchDeadZone2";
             }
         }
-        // if (pointer.x >= leftWidth2 && pointer.x <= rightWidth2) {
-        //     console.log("touchDeadZone 2");
-        //     return "touchDeadZone2"
-        // }
     }
     resize(gameSize) {
         width = gameSize?.width || window.innerWidth;
@@ -199,6 +210,12 @@ class Scene1PlayGame extends Phaser.Scene {
         background.displayHeight = height;
         deadzone1.setPosition((width / 2 - deadzone1.width / scaleDeadzoneSize), 3 / 4 * height);
         deadzone2.setPosition(deadzone1.x + deadzone1.width * scaleDeadzoneSize, 3 / 4 * height);
+        clock.setPosition(width / 2 - 100, 100);
+        timeLabel.setPosition(clock.x + 120, clock.y + 10);
+        backgroundClock.setPosition(clock.x - 40, clock.y - 20);
+
+
+
     }
 
     handleLoseFocus() {
@@ -235,7 +252,9 @@ class Scene1PlayGame extends Phaser.Scene {
         if (data === null) return defaultValue;
         else return data;
     }
-
+    randomIntFromInterval(min, max) { // min and max included 
+        return Math.floor(Math.random() * (max - min + 1) + min)
+    }
     update() {
         // this.shadow.x = this.object.x - 20;
         // this.shadow.y = this.object.y - 20;

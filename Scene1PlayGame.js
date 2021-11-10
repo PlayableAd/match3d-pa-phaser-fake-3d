@@ -1,4 +1,4 @@
-var background, clock, backgroundClock, timeLabel, deadzone1, deadzone2, plate;
+var background, ctaButton, clock, backgroundClock, timeLabel, deadzone1, deadzone2, plate;
 var width = window.innerWidth, height = window.innerHeight;
 var scaleDeadzoneSize = 1.5;
 let halfHeightDeadZone, halfWidthDeadZone;
@@ -18,13 +18,14 @@ class Scene1PlayGame extends Phaser.Scene {
         var shapes = this.cache.json.get('Key_physicsLine');
 
         background = this.add.image(0, 0, KEY_BACKGROUND).setOrigin(0);
+        ctaButton = this.add.image(0, 0, KEY_CTA_BUTTON).setOrigin(0).setPosition(20, height - 100).setScale(.35).setInteractive();
         clock = this.add.image(0, 0, KEY_CLOCK).setScale(0.7).setDepth(10).setOrigin(0).setPosition(width / 2 - 100, 100);
         timeLabel = this.add.text(width / 2, 100, "59", { fontFamily: "Righteous, cursive", fontSize: '70px', fill: '#fff' }).setOrigin(0).setDepth(10).setPosition(clock.x + 120, clock.y + 10);
         backgroundClock = this.add.image(0, 0, KEY_BACKGROUND_CLOCK).setOrigin(0).setScale(0.8).setDepth(9).setPosition(clock.x - 40, clock.y - 20);
         deadzone1 = this.add.image(0, 0, KEY_DEADZONE).setScale(scaleDeadzoneSize).setInteractive();
-        deadzone1.setPosition((width / 2 - deadzone1.width / scaleDeadzoneSize), 3 / 4 * height);
+        deadzone1.setPosition((width / 2 - deadzone1.width / scaleDeadzoneSize), 4 / 5 * height);
         deadzone2 = this.add.image(0, 0, KEY_DEADZONE).setScale(scaleDeadzoneSize).setInteractive();
-        deadzone2.setPosition(deadzone1.x + deadzone1.width * scaleDeadzoneSize, 3 / 4 * height)
+        deadzone2.setPosition(deadzone1.x + deadzone1.width * scaleDeadzoneSize, 4 / 5 * height)
 
         let objLength = 10;
 
@@ -42,12 +43,12 @@ class Scene1PlayGame extends Phaser.Scene {
             this.input.setDraggable(container);
             this.matter.add.gameObject(container, { shape: shapes.Icon_Star })
         }
-        deadzone1.on('pointerover', function () {
-            console.log('deadzone1 hover');
+        ctaButton.on('pointerdown', function () {
+            console.log('GOTOSTORE');
         });
-        deadzone2.on('pointerover', function () {
-            console.log('deadzone2 hover');
-        });
+        // deadzone2.on('pointerover', function () {
+        //     console.log('deadzone2 hover');
+        // });
 
         let this2 = this;
         checkGroup = this.add.group();
@@ -208,8 +209,9 @@ class Scene1PlayGame extends Phaser.Scene {
         this.matter.world.setBounds(0, 0, width, height);
         background.displayWidth = width;
         background.displayHeight = height;
-        deadzone1.setPosition((width / 2 - deadzone1.width / scaleDeadzoneSize), 3 / 4 * height);
-        deadzone2.setPosition(deadzone1.x + deadzone1.width * scaleDeadzoneSize, 3 / 4 * height);
+        ctaButton.setPosition(20, height - 100)
+        deadzone1.setPosition((width / 2 - deadzone1.width / scaleDeadzoneSize), 4 / 5 * height);
+        deadzone2.setPosition(deadzone1.x + deadzone1.width * scaleDeadzoneSize, 4 / 5 * height);
         clock.setPosition(width / 2 - 100, 100);
         timeLabel.setPosition(clock.x + 120, clock.y + 10);
         backgroundClock.setPosition(clock.x - 40, clock.y - 20);

@@ -1,7 +1,7 @@
 function gameStart() { }
-var nAssets = 7;
+var nAssets = 13;
 var nLoaded = 0;
-var bgSound, jumpSound, winSound, loseSound, attackSound, collectCoinSound, hitBonusBlockSound, killEnemySound, standOnEnemySound, flagSound, bossDeadSound;
+var matchTrueSound, matchFailSound, gameWinSound;
 var Sounds;
 class Preload extends Phaser.Scene {
     constructor() {
@@ -31,20 +31,37 @@ class Preload extends Phaser.Scene {
         nLoaded++;
         this.textures.addBase64(KEY_BACKGROUND_CLOCK, sprBackgroundClockB64);
         nLoaded++;
+        this.textures.addBase64(KEY_CLEAR_LEVEL, sprClearLevelB64);
+        nLoaded++;
+        this.textures.addBase64(KEY_SCORE, sprScoreB64);
+        nLoaded++;
+        this.textures.addBase64(KEY_CLAIM_BUTTON, sprClaimBtnB64);
+        nLoaded++;
+        this.textures.addBase64(KEY_FAIL_LEVEL, sprFailLevelB64)
+        nLoaded++;
+        this.textures.addBase64(KEY_RETRY, sprRetryB64)
+        nLoaded++;
+        Sounds = {
+            backgroundSound: new Howl({
+                src: matchTrueB64,
+                loop: true,
+            }),
+            matchTrueSound: new Howl({
+                src: matchTrueB64,
+
+            }),
+            matchFailSound: new Howl({
+                src: matchFailB64,
+            }),
+            gameWinSound: new Howl({
+                src: gameWinB64,
+            }),
+        };
+        nLoaded++;
         if (nLoaded >= nAssets) {
             var actualCreate = this.createGameObjects.bind(this);
             actualCreate();
         }
-        // Sounds = {
-        //     bgSound: new Howl({
-        //         src: backgroundSoundB64,
-        //         loop: true,
-        //     }),
-        //     jumpSound: new Howl({
-        //         src: jumpSoundB64,
-        //     }),
-        // };
-        // nLoaded++;
 
         // sprPlayerWeaponImg.onload = () => {
         //     this.textures.addSpriteSheet("sprPlayerWeapon", sprPlayerWeaponImg, {

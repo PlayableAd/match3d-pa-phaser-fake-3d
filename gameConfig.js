@@ -15,7 +15,7 @@ var config = {
         parent: 'phaser-example',
         autoCenter: Phaser.Scale.CENTER_BOTH,
     },
-    scene: [Preload, Scene1PlayGame],
+    scene: [Preload,Scene1PlayGame,Scene2EndGame],
     audio: {
         disableWebAudio: true,
     },
